@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TrailSearch from '@/components/TrailSearch';
 import { EXAMPLE_STORIES } from '@/lib/examples';
+import { INTERESTS_MAP, getSubcategoryLabel } from '@/lib/constants';
 
 export default function HomePage() {
   const router = useRouter();
@@ -71,9 +72,26 @@ export default function HomePage() {
                 <h3 className="font-semibold text-lg mb-1 group-hover:text-green-600 transition-colors">
                   {example.name}
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 mb-3">
                   {example.location}
                 </p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {example.interests.map(({ category, subcategory }) => {
+                    const categoryLabel = INTERESTS_MAP[category]?.label || category;
+                    const subcategoryLabel = subcategory !== 'overview'
+                      ? ` (${getSubcategoryLabel(category, subcategory)})`
+                      : '';
+
+                    return (
+                      <span
+                        key={`${category}-${subcategory}`}
+                        className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium"
+                      >
+                        {categoryLabel}{subcategoryLabel}
+                      </span>
+                    );
+                  })}
+                </div>
               </button>
             ))}
           </div>
