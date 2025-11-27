@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { INTERESTS_MAP, getSubcategoryLabel } from '@/lib/constants';
 
-export default function StoryPage() {
+function StoryContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [storyData, setStoryData] = useState(null);
@@ -199,5 +199,17 @@ export default function StoryPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function StoryPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    }>
+      <StoryContent />
+    </Suspense>
   );
 }

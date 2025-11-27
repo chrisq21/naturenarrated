@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function GeneratingPage() {
+function GeneratingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState('Generating your story...');
@@ -121,5 +121,22 @@ export default function GeneratingPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function GeneratingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+          <div className="mb-6">
+            <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-green-600"></div>
+          </div>
+          <h2 className="text-2xl font-bold mb-3">Loading...</h2>
+        </div>
+      </div>
+    }>
+      <GeneratingContent />
+    </Suspense>
   );
 }

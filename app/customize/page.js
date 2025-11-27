@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import InterestSelector from '@/components/InterestSelector';
 
-export default function CustomizePage() {
+function CustomizeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [trail, setTrail] = useState(null);
@@ -134,5 +134,17 @@ export default function CustomizePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CustomizePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    }>
+      <CustomizeContent />
+    </Suspense>
   );
 }
