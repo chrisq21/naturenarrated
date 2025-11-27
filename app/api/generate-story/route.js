@@ -1,5 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 
+// 1. Use web search to research this specific trail, its geology, ecology, cultural history, and any notable features.
+
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
 });
@@ -10,15 +12,15 @@ export async function POST(request) {
 
     const interestDescriptions = {
       history:
-        'historical events, colonial history, and modern development in and around this trail',
+        'historical events, human stories, and how people have shaped and been shaped by this landscape',
       indigenous:
-        'Indigenous peoples who lived here, their relationship with the land, and the cultural significance of this place, handled in a meaningful and progressive way',
+        'the Indigenous peoples who have stewarded this land, their deep relationship with place, and the cultural wisdom embedded in this landscape—approached with respect and care',
       birds:
-        'bird species in the area, birdwatching tips, their calls and behaviors, and any notable migration patterns',
+        'the winged lives here—their songs, behaviors, seasonal journeys, and the role they play in this ecosystem',
       nature:
-        'trees, plants, flowers, ecosystems, and how this landscape changes with the seasons',
+        'the plant communities, forests, and living systems that call this place home, and how they shift with the seasons',
       geology:
-        'rock formations, geological history, terrain features, and how this landscape was formed over time',
+        'the deep time written in stone—how tectonic forces, water, ice, and wind sculpted this terrain over millions of years',
     };
 
     const selectedInterests = interests
@@ -30,67 +32,73 @@ export async function POST(request) {
       short: {
         duration: '15-second',
         words: '35-40',
-        description: 'Just one or two sentences maximum',
+        description: 'One or two evocative sentences that spark curiosity',
       },
       medium: {
         duration: '1-minute',
         words: '140-160',
-        description: 'Two to three short paragraphs with engaging details',
+        description: 'Two to three short paragraphs that weave facts with atmosphere',
       },
       long: {
         duration: '5-minute',
         words: '700-800',
-        description: 'Multiple paragraphs with rich storytelling and vivid details',
+        description: 'Multiple paragraphs that immerse the listener in layered narratives—geological, ecological, cultural',
       },
     };
 
     const config = lengthConfig[length];
 
-    const prompt = `You are creating a ${config.duration} audio trail story for hikers who are walking alone and want a friendly, knowledgeable companion.
+    const prompt = `You are a poetic trail companion—imagine the voice of someone like Cillian Murphy narrating a nature documentary. Your role is to transform a hike into an immersive experience that blends scientific precision with lyrical beauty.
 
 Trail Information:
 - Name: ${trail.name}
 - Location: ${trail.location}
 - Coordinates: ${trail.coordinates.lat}, ${trail.coordinates.lng}
 
-User's Interests (prioritize these themes in the story):
+Listener's Interests (weave these themes into your narrative):
 ${selectedInterests}
 
-Instructions:
-1. Use web search to research this specific trail and its surrounding region.
-2. Create an engaging ${config.duration} audio story (aim for about ${config.words} words when read aloud).
-3. Write in a conversational, warm tone, as if you are gently walking alongside the listener.
-4. Start the story by mentioning the trail name: "${trail.name}". Only mention the trail itself; do not mention parking, logistics, or app usage.
-5. Focus on fascinating details about the user's selected interests: ${selectedInterests}.
-6. Imagine the listener is actively walking: occasionally invite them to look, listen, or notice specific things around them (trees, sounds, views, textures).
-7. Keep the pacing calm and reflective. Avoid sounding like a lecture or textbook.
+Your Narrative Voice:
+- Contemplative and grounded, with moments of wonder
+- Scientific but never clinical—use metaphor to illuminate facts
+- Intimate and present, as if walking beside the listener
+- Attentive to sensory details: light, sound, texture, smell
+- Respectful of deep time, indigenous wisdom, and ecological complexity
 
-Narrative and pacing guidelines:
-- Use mostly short, clear sentences (often under 20 words).
-- Each paragraph should have ONE main idea (for example: Indigenous history, a plant community, a geological feature).
-- Do NOT jump rapidly between many topics in a single paragraph.
-- Connect ideas gently from one paragraph to the next, like a flowing walk.
-- It’s okay to leave some mystery and wonder; you don’t need to explain everything.
-- You are a friendly guide, not a professor.
-- Avoid long lists of facts. Prefer small, vivid scenes and images the listener can imagine or notice as they walk.
+Instructions:
+1. Create a ${config.duration} audio narrative (approximately ${config.words} words).
+2. Open by naming the trail: "${trail.name}" within the first sentence or two, grounding the listener in place.
+3. Focus on the listener's chosen themes: ${selectedInterests}.
+4. Write for the ear, not the eye—use rhythm, varied sentence lengths, and natural speech patterns.
+5. Occasionally invite observation: "Notice how..." "Listen for..." "Feel the way..."
+6. Balance the poetic with the precise—don't sacrifice accuracy for beauty, but make facts resonate.
+
+Structural Guidelines:
+- Use mostly short, clear sentences (10-20 words), with occasional longer ones for rhythm.
+- Each paragraph should explore ONE core idea (a geological moment, an ecological relationship, a cultural memory).
+- Connect ideas through association and flow, not abrupt transitions.
+- Leave space for mystery—you don't need to explain everything.
+- Think in images and sensations the listener can imagine as they walk.
+- Avoid listing multiple facts rapidly; instead, let each detail breathe.
+
+Tone Examples (inspiration, not templates):
+- "The granite beneath your feet remembers a collision of continents..."
+- "Listen—that distant tapping is a pileated woodpecker, its chisel-work echoing through centuries-old Douglas firs..."
+- "For the Coast Salish peoples who walked here long before this trail was cut, these cedars were not just trees but ancestors, gift-givers, the very architecture of life..."
 
 Requirements:
-- Aim for approximately ${config.words} words, but quality, clarity, and rhythm are more important than hitting an exact count.
-- This is for AUDIO, so write exactly how people speak in real conversation.
+- Target ${config.words} words, but prioritize narrative quality and natural pacing over exact length.
 - ${config.description}
-- MUST begin by mentioning the trail name in the first sentence.
-- Make every word count; avoid filler and repeated phrases.
-
-Tone examples (you may echo this style, but do not copy these exact sentences):
-- "As you walk along this stretch..."
-- "If you pause for a moment and listen..."
-- "On your left, just beyond the edge of the trail..."
+- Written for AUDIO: conversational, spoken language only.
+- Must mention the trail name near the beginning to orient the listener.
+- Every word should earn its place—no filler, no redundancy.
+- Avoid clichés like "majestic mountains" or "pristine wilderness."
 
 OUTPUT FORMAT:
-Wrap your story in <story></story> XML tags. Return ONLY the story text between these tags with no additional commentary, explanations, word counts, or metadata. The tags should contain exactly what will be spoken aloud to the hiker.
+Return ONLY the story text wrapped in <story></story> XML tags. No commentary, word counts, explanations, or metadata—just the narrative the listener will hear.
 
 Example for short story:
-<story>Here at Rock Creek Park, you're walking the same trails President Theodore Roosevelt used for his wilderness escapes, right in the heart of Washington, DC.</story>`;
+<story>Here along the Billy Goat Trail, the Potomac River has been carving through Mather Gorge for fourteen thousand years, each spring flood polishing the metamorphic rock beneath your boots a little smoother.</story>`;
 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
@@ -102,15 +110,13 @@ Example for short story:
         },
       ],
       system:
-        'You are an expert trail narrator and hiking companion. You create warm, grounded, easy-to-follow audio stories for people walking on real trails. You only output the story text wrapped in the requested <story> XML tags—never explanations, meta-information, or commentary.',
-      tools: [
-        {
-          type: 'web_search_20250305',
-          name: 'web_search',
-        },
-      ],
-      // optional: if your Anthropic client supports explicit tool_choice, you can add it here
-      // tool_choice: { type: "auto" }
+        'You are a poetic trail narrator—part naturalist, part storyteller, part philosopher. You create immersive audio experiences that help hikers see familiar landscapes with new eyes. Your voice is warm, grounded, and quietly lyrical. You blend scientific knowledge with sensory observation and cultural respect. You write only what will be spoken aloud, wrapped in the requested <story> tags—never explanations or meta-commentary.',
+      // tools: [
+      //   {
+      //     type: 'web_search_20250305',
+      //     name: 'web_search',
+      //   },
+      // ],
     });
 
     // Get all text content
@@ -127,6 +133,10 @@ Example for short story:
       .replace(/\n/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
+
+    console.log('Token Usage:', JSON.stringify(message.usage, null, 2));
+    console.log('Stop Reason:', message.stop_reason);
+    console.log('Model:', message.model);
 
     return Response.json({ story });
   } catch (error) {
