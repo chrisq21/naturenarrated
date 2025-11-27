@@ -56,7 +56,7 @@ export async function POST(request) {
       );
     }
 
-    // Build combined descriptions with subcategory modifiers
+    // Build combined descriptions with subcategory modifiers (for detailed narrative weaving)
     const selectedInterests = interests
       .map(({ category, subcategory }) => {
         const base = CATEGORY_DESCRIPTIONS[category] || category;
@@ -64,6 +64,31 @@ export async function POST(request) {
         return base + modifier;
       })
       .join('; ');
+
+    // Human-readable topic list for intro
+    const topicNamesForIntro = interests
+      .map(({ category, subcategory }) => {
+        const base = CATEGORY_DESCRIPTIONS[category] || category;
+        const sub = subcategory ? ` (${subcategory})` : '';
+        return `${base}${sub}`;
+      })
+      .join(', ');
+
+    // Bullet list for the structure section
+    const topicLines = interests
+      .map(({ category, subcategory }) => {
+        const base = CATEGORY_DESCRIPTIONS[category] || category;
+        const modifier = SUBCATEGORY_MODIFIERS[subcategory] || '';
+        return `- ${base}${modifier}`;
+      })
+      .join('\n      ');
+
+    // Compact summary for assessment prompt/logging
+    const interestsSummaryForAssessment = interests
+      .map(({ category, subcategory }) =>
+        subcategory ? `${category} (${subcategory})` : category
+      )
+      .join(', ');
 
     // Length configurations
     const lengthConfig = {
@@ -104,58 +129,61 @@ Your Narrative Voice:
 - Respectful of deep time, indigenous wisdom, and ecological complexity
 
 Instructions:
-1. ${useWebSearch === 'on' ? 'Use web search SPARINGLY and STRATEGICALLY—only when you need specific verification of details you are uncertain about. Prefer your training knowledge when confident. Limit to 1-3 focused searches maximum.' : 'Draw on your training knowledge about this region. You do NOT need trail-specific details—regional knowledge about the geology, ecology, indigenous peoples, and wildlife of this area is perfectly sufficient. Use what you know confidently.'}
+1. ${useWebSearch === 'on'
+        ? 'Use web search SPARINGLY and STRATEGICALLY—only when you need specific verification of details you are uncertain about. Prefer your training knowledge when confident. Limit to 1-3 focused searches maximum.'
+        : 'Draw on your training knowledge about this region. You do NOT need trail-specific details—regional knowledge about the geology, ecology, indigenous peoples, and wildlife of this area is perfectly sufficient. Use what you know confidently.'}
 2. Create a ${config.duration} audio narrative (approximately ${config.words} words).
 3. STRUCTURE YOUR NARRATIVE IN THIS ORDER:
    
-   a) OPENING PARAGRAPH: Begin with the trail name ("${trail.name}") and set the scene. Give a brief sense of place—where this landscape sits, what makes it distinctive. This is your invitation into the story. (About 20-25% of total words)
+   a) INTRO PARAGRAPH:
+      - Begin with the trail name ("${trail.name}") and set the scene: where this landscape sits and what makes it distinctive.
+      - In the second half of the intro, briefly preview the themes you will explore, explicitly referring to the listener's chosen categories and subcategories in natural, spoken language.
+      - The topics you will touch on are: ${topicNamesForIntro}.
+      - This paragraph is your invitation into the story. (About 20–25% of total words)
    
-   b) TOPIC-SPECIFIC SECTIONS: Then devote focused attention to EACH of the listener's chosen interests. Treat each topic substantively:
-      ${interests.map(({ category, subcategory }) => {
-        const base = CATEGORY_DESCRIPTIONS[category] || category;
-        const modifier = SUBCATEGORY_MODIFIERS[subcategory] || '';
-        return `- ${base}${modifier}`;
-      }).join('\n      ')}
+   b) TOPIC-SPECIFIC SECTIONS:
+      Then devote focused attention to EACH of the listener's chosen interests. Treat each topic substantively:
+
+      ${topicLines}
+
+      For EACH selected topic:
+      - Dedicate a full paragraph (or more for longer stories).
+      - At the very beginning of the paragraph, briefly SIGNPOST the topic using its category and subcategory in natural speech. For example: "First, the geology of this place..." or "Now, the bird life here, especially the spring migrants..."
+      - Provide SPECIFIC, CONCRETE details: actual species names, geological time periods, indigenous nation names, historical dates.
+      - Go deeper than surface-level mentions—if it's birds, tell me which birds, their calls, behaviors, and why they're here.
+      - If it's geology, tell me the rock type, the forces, the timeline.
+      - If it's indigenous history, name the peoples, describe their practices, honor their relationship with this specific place.
    
-   For EACH selected topic:
-   - Dedicate a full paragraph (or more for longer stories)
-   - Provide SPECIFIC, CONCRETE details: actual species names, geological time periods, indigenous nation names, historical dates
-   - Go deeper than surface-level mentions—if it's birds, tell me which birds, their calls, behaviors, why they're here
-   - If it's geology, tell me the rock type, the forces, the timeline
-   - If it's indigenous history, name the peoples, describe their practices, honor their relationship with this specific place
-   
-   c) NATURAL INTERSECTIONS: Where topics genuinely connect (indigenous burning practices shaping bird habitat, geology creating plant microclimates), weave them together organically. But don't force connections—depth over artificial synthesis.
+   c) NATURAL INTERSECTIONS:
+      Where topics genuinely connect (indigenous burning practices shaping bird habitat, geology creating plant microclimates), weave them together organically in one of the topic paragraphs or a short bridging paragraph. Do not force connections—depth over artificial synthesis.
+
+   d) OUTRO PARAGRAPH:
+      - End with a brief closing paragraph (1–3 sentences).
+      - Gently remind the listener of the main themes you've explored (again, using the category/subcategory ideas in natural language rather than as labels).
+      - Leave them with a sense of ongoing relationship to this place—an invitation to keep noticing, listening, and learning as they continue on or as they plan their visit.
 
 4. Write for the ear, not the eye—use rhythm, varied sentence lengths, and natural speech patterns.
 5. Occasionally invite observation: "Notice how..." "Listen for..." "Feel the way..."
 6. Balance the poetic with the precise—don't sacrifice accuracy for beauty, but make facts resonate.
 
 Structural Guidelines:
-- Start with an INTRO PARAGRAPH that orients the listener (trail name, sense of place, brief invitation)
-- Then address EACH selected topic in its own dedicated section with substantial depth
-- Use mostly short, clear sentences (10-20 words), with occasional longer ones for rhythm
-- Each topic section should include SPECIFIC DETAILS: species names, geological ages, indigenous nations, particular behaviors or phenomena
-- For example, don't just say "birds live here"—tell me "the wood thrush, the scarlet tanager, the red-eyed vireo" and what they're doing
-- Don't just say "Indigenous peoples lived here"—name them (Nacotchtank, Piscataway, etc.) and describe specific practices
-- Don't just say "old rocks"—tell me granite, schist, limestone, and when they formed
-- Connect topics where they naturally intersect, but prioritize depth over forced synthesis
-- Leave space for mystery—you don't need to explain everything
-- Think in images and sensations the listener can imagine as they walk
-- Avoid mentioning multiple topics superficially in a single paragraph; instead, give each topic room to breathe
+- Start with an INTRO PARAGRAPH that orients the listener (trail name, sense of place, brief invitation, and a preview of the categories and subcategories you'll explore).
+- Then address EACH selected topic in its own dedicated section with substantial depth, starting each topic paragraph by signposting the topic.
+- Use mostly short, clear sentences (10–20 words), with occasional longer ones for rhythm.
+- Each topic section should include SPECIFIC DETAILS: species names, geological ages, indigenous nations, particular behaviors or phenomena.
+- For example, don't just say "birds live here"—tell me "the wood thrush, the scarlet tanager, the red-eyed vireo" and what they're doing.
+- Don't just say "Indigenous peoples lived here"—name them and describe specific practices.
+- Don't just say "old rocks"—tell me granite, schist, limestone, and when they formed.
+- Connect topics where they naturally intersect, but prioritize depth over forced synthesis.
+- Leave space for mystery—you don't need to explain everything.
+- Think in images and sensations the listener can imagine as they walk.
+- Avoid mentioning multiple topics superficially in a single paragraph; instead, give each topic room to breathe.
+- Always finish with a short OUTRO that ties the experience together and looks forward.
 
 Tone Examples (inspiration, not templates):
 - "The granite beneath your feet remembers a collision of continents..."
 - "Listen—that distant tapping is a pileated woodpecker, its chisel-work echoing through centuries-old Douglas firs..."
 - "For the Coast Salish peoples who walked here long before this trail was cut, these cedars were not just trees but ancestors, gift-givers, the very architecture of life..."
-
-STRUCTURE EXAMPLE (if interests were "birds" and "indigenous"):
-Paragraph 1 (Intro): "Here at [Trail Name], you're walking through a landscape where forest meets wetland, creating one of the richest bird habitats in the region..."
-
-Paragraph 2 (Birds - specific): "Listen for the wood thrush—that liquid, flute-like trill echoing from the understory. They've just arrived from Central America, traveling at night by the stars to reach these exact breeding grounds. The males are establishing territories now, each song a claim to ten or fifteen acres of forest floor where they'll nest in the low branches of spicebush and mountain laurel..."
-
-Paragraph 3 (Indigenous - specific): "The Piscataway people called this watershed home for twelve thousand years. They knew the rhythms of the shad runs, returning each spring to fish the tributaries. Their practice of controlled burning kept the oak forests open, creating the edge habitat that still draws migrating warblers today..."
-
-Paragraph 4 (Natural intersection): "That connection between fire and birds isn't accidental—the cleared understory the Piscataway maintained created the very conditions wood thrushes prefer: open ground for foraging, dense canopy above for nesting..."
 
 Requirements:
 - Target ${config.words} words, but prioritize narrative quality and natural pacing over exact length.
@@ -166,10 +194,7 @@ Requirements:
 - Avoid clichés like "majestic mountains" or "pristine wilderness."
 
 OUTPUT FORMAT:
-Return ONLY the story text wrapped in <story></story> XML tags. No commentary, word counts, explanations, or metadata—just the narrative the listener will hear.
-
-Example structure for a medium-length story with "geology" and "birds" interests:
-<story>Here along the Billy Goat Trail, the Potomac River has carved through Mather Gorge for fourteen thousand years, creating one of the most geologically dramatic landscapes within sight of any capital city. The bedrock beneath your boots is Mather Gorge schist—ancient seafloor sediments that were buried, compressed, and metamorphosed nearly five hundred million years ago, long before the first fish crawled onto land. Notice the wavy bands in the rock, each layer a remnant of deep ocean mud, now tilted nearly vertical by the collision that built the Appalachian Mountains. The Potomac has been exploiting these weaknesses ever since the glaciers retreated, carving deeper each spring flood. Listen for the sharp killy-killy-killy call—that's a common yellowthroat, a tiny warbler that nests in the riverside thickets. They migrate here each April from Mexico and Central America, the males arriving first to claim the best territories among the sycamores and river birch. Watch for their distinctive black mask as they flit through the understory, hunting insects stirred up by the river's edge.</story>`;
+Return ONLY the story text wrapped in <story></story> XML tags. No commentary, word counts, explanations, or metadata—just the narrative the listener will hear.`;
 
     // Determine if web search should be enabled
     let enableWebSearch = useWebSearch === 'on';
@@ -178,7 +203,7 @@ Example structure for a medium-length story with "geology" and "birds" interests
       // Ask Claude if it needs web search for this region
       const assessmentPrompt = `Region: ${trail.location}
 Trail: ${trail.name}
-User interests: ${interests.join(', ')}
+User interests: ${interestsSummaryForAssessment}
 
 Do you have sufficient knowledge from your training data to create a detailed, accurate ${length} story about this REGION covering these topics? Focus on regional knowledge, not trail-specific details. Consider:
 - Do you know the geology and landscape formation of this region?
@@ -214,7 +239,7 @@ Respond with ONLY "YES" if you have strong regional knowledge, or "NO" if you ne
       console.log('=== Web Search Assessment ===');
       console.log(`Trail: ${trail.name}`);
       console.log(`Location: ${trail.location}`);
-      console.log(`Interests: ${interests.join(', ')}`);
+      console.log(`Interests: ${interestsSummaryForAssessment}`);
       console.log(`Assessment Response: ${assessmentResponse}`);
       console.log(`Web Search Enabled: ${enableWebSearch}`);
       console.log('============================');
@@ -254,16 +279,17 @@ Respond with ONLY "YES" if you have strong regional knowledge, or "NO" if you ne
 
     // Track actual token usage
     if (message.usage) {
-      trackTokens(message.usage.input_tokens);
+      const usage = message.usage;
+      trackTokens(usage.input_tokens);
 
       console.log('=== Story Generation Complete ===');
-      console.log(`Input Tokens: ${message.usage.input_tokens}`);
-      console.log(`Output Tokens: ${message.usage.output_tokens}`);
-      if (message.usage.cache_creation_input_tokens) {
-        console.log(`Cache Creation Tokens: ${message.usage.cache_creation_input_tokens}`);
+      console.log(`Input Tokens: ${usage.input_tokens}`);
+      console.log(`Output Tokens: ${usage.output_tokens}`);
+      if (usage.cache_creation_input_tokens) {
+        console.log(`Cache Creation Tokens: ${usage.cache_creation_input_tokens}`);
       }
-      if (message.usage.cache_read_input_tokens) {
-        console.log(`Cache Read Tokens: ${message.usage.cache_read_input_tokens}`);
+      if (usage.cache_read_input_tokens) {
+        console.log(`Cache Read Tokens: ${usage.cache_read_input_tokens}`);
       }
       console.log(`Web Search Used: ${enableWebSearch}`);
       console.log('=================================');
