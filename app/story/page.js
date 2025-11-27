@@ -67,6 +67,39 @@ export default function StoryPage() {
     }
   };
 
+  const renderStoryWithLabels = (story) => {
+    if (!story) return null;
+
+    // Split by double line breaks to get paragraphs
+    const paragraphs = story.split('\n\n');
+    const elements = [];
+
+    paragraphs.forEach((para, index) => {
+      const trimmed = para.trim();
+      if (!trimmed) return;
+
+      // Check if this is a label line (format: **Label Text**)
+      if (trimmed.match(/^\*\*[^*]+\*\*$/)) {
+        // This is a category label
+        const label = trimmed.replace(/\*\*/g, '');
+        elements.push(
+          <h3 key={`label-${index}`} className="text-lg font-bold text-green-700 mt-8 mb-3 first:mt-0">
+            {label}
+          </h3>
+        );
+      } else {
+        // Regular paragraph
+        elements.push(
+          <p key={`para-${index}`} className="mb-4 leading-relaxed">
+            {trimmed}
+          </p>
+        );
+      }
+    });
+
+    return elements;
+  };
+
   if (!storyData) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
@@ -125,12 +158,14 @@ export default function StoryPage() {
                 >
                   Your browser does not support audio playback.
                 </audio>
-                <button
-                  onClick={downloadAudio}
-                  className="mt-4 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  ⬇️ Download for Offline Listening
-                </button>
+                <div className="flex justify-center">
+                  <button
+                    onClick={downloadAudio}
+                    className="mt-4 max-w-xs px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    ⬇️ Download for Offline Listening
+                  </button>
+                </div>
               </>
             ) : (
               // Browser TTS controls
@@ -158,8 +193,8 @@ export default function StoryPage() {
         {/* Story Text */}
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <h2 className="text-xl font-semibold mb-4">Story Transcript</h2>
-          <div className="prose prose-lg max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
-            {storyData.story}
+          <div className="prose prose-lg max-w-none text-gray-700">
+            {renderStoryWithLabels(storyData.story)}
           </div>
         </div>
       </div>

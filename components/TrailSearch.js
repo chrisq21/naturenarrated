@@ -72,7 +72,7 @@ export default function TrailSearch({ onTrailSelect }) {
     >
       <div>
         <label className="block text-lg font-semibold mb-3 text-gray-700">
-          Where are you hiking today?
+          Choose a trail or location. We'll create your narration.
         </label>
 
         <Autocomplete
@@ -94,7 +94,7 @@ export default function TrailSearch({ onTrailSelect }) {
         </Autocomplete>
 
         <p className="mt-3 text-sm text-gray-500">
-          Tip: Be specific! Include the city or state for best results.
+          Include the city or state for best results.
         </p>
       </div>
     </LoadScript>

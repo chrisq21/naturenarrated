@@ -11,6 +11,13 @@ export async function POST(request) {
       );
     }
 
+    // Clean text for audio: remove category labels and markdown formatting
+    const cleanText = text
+      .split('\n\n')
+      .filter(para => !para.match(/^\*\*[^*]+\*\*$/))  // Remove label-only paragraphs
+      .join('\n\n')
+      .replace(/\*\*/g, '');  // Remove any remaining ** markers
+
     const response = await fetch(
       'https://api.elevenlabs.io/v1/text-to-speech/4YYIPFl9wE5c4L2eu2Gb', // Burt Reynolds voice
       {
@@ -21,7 +28,7 @@ export async function POST(request) {
           'xi-api-key': process.env.ELEVENLABS_API_KEY
         },
         body: JSON.stringify({
-          text: text,
+          text: cleanText,
           model_id: 'eleven_turbo_v2',
           voice_settings: {
             stability: 0.5,

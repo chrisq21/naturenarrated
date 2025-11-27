@@ -90,7 +90,7 @@ export default function CustomizePage() {
                 }`}
               >
                 <div className="text-sm">Short</div>
-                <div className="text-xs opacity-75">15 seconds</div>
+                <div className="text-xs opacity-75">20-40 sec</div>
               </button>
               <button
                 onClick={() => setStoryLength('medium')}
@@ -101,7 +101,7 @@ export default function CustomizePage() {
                 }`}
               >
                 <div className="text-sm">Medium</div>
-                <div className="text-xs opacity-75">1 minute</div>
+                <div className="text-xs opacity-75">90s-2.5 min</div>
               </button>
               <button
                 onClick={() => setStoryLength('long')}
@@ -112,14 +112,14 @@ export default function CustomizePage() {
                 }`}
               >
                 <div className="text-sm">Long</div>
-                <div className="text-xs opacity-75">5 minutes</div>
+                <div className="text-xs opacity-75">4-6 min</div>
               </button>
             </div>
           </div>
 
           <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm text-gray-700">
-              <strong>Story length:</strong> {storyLength === 'short' ? '15 seconds' : storyLength === 'medium' ? '1 minute' : '5 minutes'}<br />
+              <strong>Story length:</strong> {storyLength === 'short' ? '20-40 seconds' : storyLength === 'medium' ? '90 seconds-2.5 minutes' : '4-6 minutes'}<br />
               <strong>Style:</strong> Conversational and punchy
             </p>
           </div>

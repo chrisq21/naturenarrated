@@ -93,18 +93,18 @@ export async function POST(request) {
     // Length configurations
     const lengthConfig = {
       short: {
-        duration: '15-second',
-        words: '35-40',
+        duration: '20-40 seconds',
+        words: '35-50',
         description: 'One or two evocative sentences that spark curiosity',
       },
       medium: {
-        duration: '1-minute',
-        words: '140-160',
+        duration: '90 seconds-2.5 minutes',
+        words: '180-240',
         description: 'Two to three short paragraphs that weave facts with atmosphere',
       },
       long: {
-        duration: '5-minute',
-        words: '700-800',
+        duration: '4-6 minutes',
+        words: '600-800',
         description: 'Multiple paragraphs that immerse the listener in layered narratives—geological, ecological, cultural',
       },
     };
@@ -147,8 +147,12 @@ Instructions:
       ${topicLines}
 
       For EACH selected topic:
-      - Dedicate a full paragraph (or more for longer stories).
-      - At the very beginning of the paragraph, briefly SIGNPOST the topic using its category and subcategory in natural speech. For example: "First, the geology of this place..." or "Now, the bird life here, especially the spring migrants..."
+      - BEFORE the paragraph, add a label line on its own in this exact format: **[Category Label]: [Subcategory Label]**
+        For example: **Geology: How This Formed** or **Birds: Songs You'll Hear** or **Plants & Ecology: Trees Along the Trail**
+      - The label should be on its own line, followed by a blank line, then the paragraph begins.
+      - Use the natural, readable category and subcategory names (like "Indigenous History", "Birds", "Plants & Ecology").
+      - Do NOT add these labels before the intro or outro paragraphs—only before topic-specific sections.
+      - Dedicate a full paragraph (or more for longer stories) to each topic.
       - Provide SPECIFIC, CONCRETE details: actual species names, geological time periods, indigenous nation names, historical dates.
       - Go deeper than surface-level mentions—if it's birds, tell me which birds, their calls, behaviors, and why they're here.
       - If it's geology, tell me the rock type, the forces, the timeline.
@@ -168,7 +172,7 @@ Instructions:
 
 Structural Guidelines:
 - Start with an INTRO PARAGRAPH that orients the listener (trail name, sense of place, brief invitation, and a preview of the categories and subcategories you'll explore).
-- Then address EACH selected topic in its own dedicated section with substantial depth, starting each topic paragraph by signposting the topic.
+- Then address EACH selected topic in its own dedicated section. Before each topic paragraph, add the label line **Category: Subcategory** on its own line with a blank line following it.
 - Use mostly short, clear sentences (10–20 words), with occasional longer ones for rhythm.
 - Each topic section should include SPECIFIC DETAILS: species names, geological ages, indigenous nations, particular behaviors or phenomena.
 - For example, don't just say "birds live here"—tell me "the wood thrush, the scarlet tanager, the red-eyed vireo" and what they're doing.
