@@ -1,18 +1,27 @@
-const INTERESTS = [
-  { id: 'history', label: 'Historical Events', icon: '🏛️' },
-  { id: 'indigenous', label: 'Indigenous History', icon: '🪶' },
-  { id: 'birds', label: 'Wildlife & Birds', icon: '🦅' },
-  { id: 'nature', label: 'Nature & Plants', icon: '🌿' },
-  { id: 'geology', label: 'Geology', icon: '🪨' }
-];
+import { INTERESTS } from '@/lib/constants';
 
 export default function InterestSelector({ selectedInterests, onInterestsChange }) {
   const toggleInterest = (interestId) => {
-    if (selectedInterests.includes(interestId)) {
-      onInterestsChange(selectedInterests.filter(id => id !== interestId));
+    const existing = selectedInterests.find(si => si.category === interestId);
+
+    if (existing) {
+      onInterestsChange(selectedInterests.filter(si => si.category !== interestId));
     } else if (selectedInterests.length < 3) {
-      onInterestsChange([...selectedInterests, interestId]);
+      onInterestsChange([
+        ...selectedInterests,
+        { category: interestId, subcategory: 'overview' }
+      ]);
     }
+  };
+
+  const handleSubcategoryChange = (categoryId, newSubcategoryId) => {
+    onInterestsChange(
+      selectedInterests.map(si =>
+        si.category === categoryId
+          ? { ...si, subcategory: newSubcategoryId }
+          : si
+      )
+    );
   };
 
   return (
@@ -23,27 +32,47 @@ export default function InterestSelector({ selectedInterests, onInterestsChange 
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
         {INTERESTS.map(interest => (
-          <button
-            key={interest.id}
-            onClick={() => toggleInterest(interest.id)}
-            disabled={
-              !selectedInterests.includes(interest.id) &&
-              selectedInterests.length >= 3
-            }
-            className={`p-4 rounded-lg border-2 transition-all text-left ${
-              selectedInterests.includes(interest.id)
-                ? 'border-green-500 bg-green-50'
-                : 'border-gray-200 hover:border-gray-300'
-            } ${
-              !selectedInterests.includes(interest.id) &&
-              selectedInterests.length >= 3
-                ? 'opacity-50 cursor-not-allowed'
-                : 'cursor-pointer'
-            }`}
-          >
-            <span className="text-3xl mr-2">{interest.icon}</span>
-            <span className="font-medium">{interest.label}</span>
-          </button>
+          <div key={interest.id}>
+            <button
+              onClick={() => toggleInterest(interest.id)}
+              disabled={
+                !selectedInterests.some(si => si.category === interest.id) &&
+                selectedInterests.length >= 3
+              }
+              className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                selectedInterests.some(si => si.category === interest.id)
+                  ? 'border-green-500 bg-green-50'
+                  : 'border-gray-200 hover:border-gray-300'
+              } ${
+                !selectedInterests.some(si => si.category === interest.id) &&
+                selectedInterests.length >= 3
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'cursor-pointer'
+              }`}
+            >
+              <span className="text-3xl mr-2">{interest.icon}</span>
+              <span className="font-medium">{interest.label}</span>
+            </button>
+
+            {selectedInterests.find(si => si.category === interest.id) && (
+              <div className="mt-2 pl-4 transition-all duration-200">
+                <label className="text-sm text-gray-600 block mb-1">
+                  Focus area:
+                </label>
+                <select
+                  value={selectedInterests.find(si => si.category === interest.id).subcategory}
+                  onChange={(e) => handleSubcategoryChange(interest.id, e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                >
+                  {interest.subcategories.map(sub => (
+                    <option key={sub.id} value={sub.id}>
+                      {sub.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
         ))}
       </div>
 

@@ -36,7 +36,9 @@ export default function CustomizePage() {
       location: trail.location,
       lat: trail.coordinates.lat,
       lng: trail.coordinates.lng,
-      interests: selectedInterests.join(','),
+      interests: selectedInterests
+        .map(si => `${si.category}:${si.subcategory}`)
+        .join(','),
       length: storyLength
     });
 

@@ -23,7 +23,10 @@ export default function GeneratingPage() {
           lng: parseFloat(searchParams.get('lng'))
         }
       };
-      const interests = searchParams.get('interests').split(',');
+      const interests = searchParams.get('interests').split(',').map(pair => {
+        const [category, subcategory] = pair.split(':');
+        return { category, subcategory: subcategory || 'overview' };
+      });
       const storyLength = searchParams.get('length') || 'short';
 
       // Step 1: Generate text story
@@ -83,7 +86,7 @@ export default function GeneratingPage() {
         const params = new URLSearchParams({
           name: trail.name,
           location: trail.location,
-          interests: interests.join(','),
+          interests: interests.map(si => `${si.category}:${si.subcategory}`).join(','),
           story: story,
           hasAudio: audioDataUrl ? 'true' : 'false'
         });

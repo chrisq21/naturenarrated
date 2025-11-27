@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { INTERESTS_MAP, getSubcategoryLabel } from '@/lib/constants';
 
 export default function StoryPage() {
   const searchParams = useSearchParams();
@@ -13,7 +14,10 @@ export default function StoryPage() {
     const data = {
       trailName: searchParams.get('name'),
       trailLocation: searchParams.get('location'),
-      interests: searchParams.get('interests')?.split(','),
+      interests: searchParams.get('interests')?.split(',').map(pair => {
+        const [category, subcategory] = pair.split(':');
+        return { category, subcategory: subcategory || 'overview' };
+      }),
       story: searchParams.get('story'),
       audioDataUrl: searchParams.get('hasAudio') === 'true'
         ? sessionStorage.getItem('trailhead-audio')
@@ -88,14 +92,21 @@ export default function StoryPage() {
           <p className="text-gray-600 mb-4">{storyData.trailLocation}</p>
 
           <div className="flex flex-wrap gap-2 mb-6">
-            {storyData.interests.map(interest => (
-              <span
-                key={interest}
-                className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium"
-              >
-                {interest}
-              </span>
-            ))}
+            {storyData.interests.map(({ category, subcategory }) => {
+              const categoryLabel = INTERESTS_MAP[category]?.label || category;
+              const subcategoryLabel = subcategory !== 'overview'
+                ? ` (${getSubcategoryLabel(category, subcategory)})`
+                : '';
+
+              return (
+                <span
+                  key={`${category}-${subcategory}`}
+                  className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium"
+                >
+                  {categoryLabel}{subcategoryLabel}
+                </span>
+              );
+            })}
           </div>
 
           {/* Audio Player */}

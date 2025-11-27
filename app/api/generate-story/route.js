@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { CATEGORY_DESCRIPTIONS, SUBCATEGORY_MODIFIERS } from '@/lib/constants';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
@@ -55,22 +56,14 @@ export async function POST(request) {
       );
     }
 
-    const interestDescriptions = {
-      history:
-        'historical events, human stories, and how people have shaped and been shaped by this landscape',
-      indigenous:
-        'the Indigenous peoples who have stewarded this land, their deep relationship with place, and the cultural wisdom embedded in this landscape—approached with respect and care',
-      birds:
-        'the winged lives here—their songs, behaviors, seasonal journeys, and the role they play in this ecosystem',
-      nature:
-        'the plant communities, forests, and living systems that call this place home, and how they shift with the seasons',
-      geology:
-        'the deep time written in stone—how tectonic forces, water, ice, and wind sculpted this terrain over millions of years',
-    };
-
+    // Build combined descriptions with subcategory modifiers
     const selectedInterests = interests
-      .map((i) => interestDescriptions[i])
-      .join(', ');
+      .map(({ category, subcategory }) => {
+        const base = CATEGORY_DESCRIPTIONS[category] || category;
+        const modifier = SUBCATEGORY_MODIFIERS[subcategory] || '';
+        return base + modifier;
+      })
+      .join('; ');
 
     // Length configurations
     const lengthConfig = {
@@ -118,7 +111,11 @@ Instructions:
    a) OPENING PARAGRAPH: Begin with the trail name ("${trail.name}") and set the scene. Give a brief sense of place—where this landscape sits, what makes it distinctive. This is your invitation into the story. (About 20-25% of total words)
    
    b) TOPIC-SPECIFIC SECTIONS: Then devote focused attention to EACH of the listener's chosen interests. Treat each topic substantively:
-      ${interests.map(i => `- ${interestDescriptions[i]}`).join('\n      ')}
+      ${interests.map(({ category, subcategory }) => {
+        const base = CATEGORY_DESCRIPTIONS[category] || category;
+        const modifier = SUBCATEGORY_MODIFIERS[subcategory] || '';
+        return `- ${base}${modifier}`;
+      }).join('\n      ')}
    
    For EACH selected topic:
    - Dedicate a full paragraph (or more for longer stories)
